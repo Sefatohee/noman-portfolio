@@ -1,0 +1,29 @@
+---
+// No imports needed here
+---
+
+<div class="w-full h-full overflow-hidden">
+    <canvas class="block w-full h-full" id="hero-canvas"></canvas>
+</div>
+
+<script>
+    const { Rive, Layout, Fit, Alignment } = await import("@rive-app/canvas");
+
+    const canvas: any = document.getElementById("hero-canvas");
+
+    if (canvas) {
+        const rive = new Rive({
+            src: "/HeroAnimation.riv",
+            canvas,
+            autoplay: true,
+            stateMachines: "State Machine 1",
+            layout: new Layout({
+                fit: Fit.Cover,
+                alignment: Alignment.Center,
+            }),
+            onLoad: () => {
+                rive.resizeDrawingSurfaceToCanvas();
+            },
+        });
+    }
+</script>

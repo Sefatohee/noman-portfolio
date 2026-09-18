@@ -12,7 +12,10 @@
     "astro": "astro"
   },
   "dependencies": {
-    "astro": "^7.2.9"
+    "@rive-app/canvas": "^2.41.0",
+    "@tailwindcss/vite": "^4.3.3",
+    "astro": "^7.2.9",
+    "tailwindcss": "^4.3.3"
   },
   "allowScripts": {
     "esbuild": true

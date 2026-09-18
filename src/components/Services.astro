@@ -1,0 +1,267 @@
+---
+import Container from "../layouts/Container.astro";
+import service1 from "../assets/Service_Art.png";
+import service2 from "../assets/Service_Assets.png";
+import service3 from "../assets/Service_SpineAnimation.png";
+
+const services = [
+    {
+        title: "Brand Identity",
+        label: "Image placeholder 01",
+        tone: "from-[#7d3cff] via-[#243f98] to-[#1d212d]",
+        serviceUrl: service1.src,
+    },
+    {
+        title: "Digital Design",
+        label: "Image placeholder 02",
+        tone: "from-[#ff704d] via-[#8435aa] to-[#1d212d]",
+        serviceUrl: service2.src,
+    },
+    {
+        title: "Motion Graphics",
+        label: "Image placeholder 03",
+        tone: "from-[#19b6ff] via-[#2453a8] to-[#1d212d]",
+        serviceUrl: service3.src,
+    },
+];
+---
+
+<section class="py-16 sm:py-24" aria-labelledby="services-title">
+    <Container>
+        <div class="services-slider" data-services-slider>
+            <div class="mb-6 flex items-end justify-between gap-4 sm:mb-8">
+                <h2
+                    id="services-title"
+                    class="m-0 font-display text-4xl font-bold uppercase leading-none text-white sm:text-5xl"
+                >
+                    Our <span class="text-[#20aaff]">Services</span>
+                </h2>
+
+                <div class="hidden gap-2 sm:flex">
+                    <button
+                        class="slider-arrow"
+                        type="button"
+                        data-slide-previous
+                        aria-label="Previous service"
+                    >
+                        <span aria-hidden="true">&#8592;</span>
+                    </button>
+                    <button
+                        class="slider-arrow"
+                        type="button"
+                        data-slide-next
+                        aria-label="Next service"
+                    >
+                        <span aria-hidden="true">&#8594;</span>
+                    </button>
+                </div>
+            </div>
+
+            <div class="relative overflow-hidden">
+                <div class="services-track" data-services-track>
+                    {
+                        services.map((service, index) => (
+                            <article
+                                class={`service-slide ${index === 0 ? "is-active" : ""}`}
+                                data-slide={index}
+                                aria-hidden={index === 0 ? "false" : "true"}
+                            >
+                                <div
+                                    class={`service-placeholder w-full rounded-2xl bg-cover bg-center bg-no-repeat ${service.tone}`}
+                                    style={`background-image: url("${service.serviceUrl}");`}
+                                ></div>
+                            </article>
+                        ))
+                    }
+                </div>
+            </div>
+
+            <div
+                class="mt-5 flex items-center justify-center gap-3"
+                data-slide-dots
+            >
+                {
+                    services.map((_, index) => (
+                        <button
+                            class={`slider-dot ${index === 0 ? "is-active" : ""}`}
+                            type="button"
+                            data-slide-dot={index}
+                            aria-label={`Show service ${index + 1}`}
+                            aria-current={index === 0 ? "true" : "false"}
+                        />
+                    ))
+                }
+            </div>
+        </div>
+    </Container>
+</section>
+
+<script>
+    const slider = document.querySelector("[data-services-slider]");
+
+    if (slider) {
+        const track = slider.querySelector("[data-services-track]");
+        const slides = [...slider.querySelectorAll("[data-slide]")];
+        const dots = [...slider.querySelectorAll("[data-slide-dot]")];
+        let currentSlide = 0;
+        let dragStartX = 0;
+        let isDragging = false;
+
+        const showSlide = (nextSlide = 0) => {
+            currentSlide = (nextSlide + slides.length) % slides.length;
+
+            slides.forEach((slide, index) => {
+                const isActive = index === currentSlide;
+                slide.classList.toggle("is-active", isActive);
+                slide.setAttribute("aria-hidden", String(!isActive));
+            });
+
+            dots.forEach((dot, index) => {
+                const isActive = index === currentSlide;
+                dot.classList.toggle("is-active", isActive);
+                dot.setAttribute("aria-current", String(isActive));
+            });
+        };
+
+        slider
+            .querySelector("[data-slide-previous]")
+            ?.addEventListener("click", () => showSlide(currentSlide - 1));
+        slider
+            .querySelector("[data-slide-next]")
+            ?.addEventListener("click", () => showSlide(currentSlide + 1));
+        dots.forEach((dot, index) =>
+            dot.addEventListener("click", () => showSlide(index)),
+        );
+
+        track?.addEventListener("pointerdown", (event) => {
+            const pointerEvent = event as unknown as {
+                clientX: number;
+                isPrimary: boolean;
+                pointerId: number;
+            };
+            if (!pointerEvent.isPrimary) return;
+
+            dragStartX = pointerEvent.clientX;
+            isDragging = true;
+            track.setPointerCapture(pointerEvent.pointerId);
+            track.classList.add("is-dragging");
+        });
+
+        track?.addEventListener("pointerup", (event) => {
+            if (!isDragging) return;
+
+            const pointerEvent = event as unknown as {
+                clientX: number;
+                pointerId: number;
+            };
+            const dragDistance = pointerEvent.clientX - dragStartX;
+            isDragging = false;
+            track.releasePointerCapture(pointerEvent.pointerId);
+            track.classList.remove("is-dragging");
+
+            if (Math.abs(dragDistance) < 50) return;
+            showSlide(dragDistance < 0 ? currentSlide + 1 : currentSlide - 1);
+        });
+
+        track?.addEventListener("pointercancel", () => {
+            isDragging = false;
+            track.classList.remove("is-dragging");
+        });
+    }
+</script>
+
+<style>
+    .services-slider {
+        color: white;
+    }
+
+    .services-track {
+        display: grid;
+        cursor: grab;
+        touch-action: pan-y;
+        user-select: none;
+    }
+
+    .services-track.is-dragging {
+        cursor: grabbing;
+    }
+
+    .service-slide {
+        display: none;
+    }
+
+    .service-slide.is-active {
+        display: block;
+        animation: slide-in 350ms ease-out;
+    }
+
+    .service-placeholder {
+        position: relative;
+        aspect-ratio: 16 / 8;
+        min-height: clamp(240px, 32vw, 440px);
+        overflow: hidden;
+    }
+
+    .placeholder-grid {
+        position: absolute;
+        inset: 0;
+        opacity: 0.2;
+        background-image:
+            linear-gradient(rgba(255, 255, 255, 0.35) 1px, transparent 1px),
+            linear-gradient(
+                90deg,
+                rgba(255, 255, 255, 0.35) 1px,
+                transparent 1px
+            );
+        background-size: 42px 42px;
+        transform: skewY(-8deg) scale(1.25);
+    }
+
+    .slider-arrow {
+        display: grid;
+        width: 42px;
+        height: 42px;
+        place-items: center;
+        border: 1px solid rgba(255, 255, 255, 0.35);
+        color: white;
+        font-size: 1.25rem;
+        transition:
+            background-color 180ms ease,
+            border-color 180ms ease;
+    }
+
+    .slider-arrow:hover,
+    .slider-arrow:focus-visible {
+        border-color: #20aaff;
+        background: #20aaff;
+        color: #1d212d;
+    }
+
+    .slider-dot {
+        width: 18px;
+        height: 18px;
+        border: 2px solid #3858aa;
+        border-radius: 999px;
+        transition:
+            background-color 180ms ease,
+            border-color 180ms ease;
+    }
+
+    .slider-dot.is-active,
+    .slider-dot:hover,
+    .slider-dot:focus-visible {
+        border-color: #20aaff;
+        background: #20aaff;
+    }
+
+    @keyframes slide-in {
+        from {
+            opacity: 0;
+            transform: translateX(18px);
+        }
+        to {
+            opacity: 1;
+            transform: translateX(0);
+        }
+    }
+</style>

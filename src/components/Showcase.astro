@@ -1,0 +1,457 @@
+---
+import Container from "../layouts/Container.astro";
+import showcaseArt1 from "../assets/Showcase_1.png";
+import showcaseArt2 from "../assets/Showcase_2.png";
+import showcaseArt3 from "../assets/Showcase_3.png";
+import showcaseArt4 from "../assets/Showcase_4.png";
+
+const showcases = {
+    art: [
+        {
+            title: "Character Art",
+            label: "Art placeholder 01",
+            tone: "from-[#b9e7dc] via-[#5aa6b9] to-[#243c78]",
+            artUrl: showcaseArt1.src,
+        },
+        {
+            title: "Game Assets",
+            label: "Art placeholder 02",
+            tone: "from-[#173c87] via-[#1c8fb1] to-[#182548]",
+            artUrl: showcaseArt2.src,
+        },
+        {
+            title: "Illustration",
+            label: "Art placeholder 03",
+            tone: "from-[#ffd6d7] via-[#e98eae] to-[#955d9d]",
+            artUrl: showcaseArt3.src,
+        },
+        {
+            title: "Visual Design",
+            label: "Art placeholder 04",
+            tone: "from-[#5bdbc3] via-[#208ba4] to-[#244776]",
+            artUrl: showcaseArt4.src,
+        },
+        {
+            title: "Asset Design",
+            label: "Art placeholder 05",
+            tone: "from-[#f7ca6b] via-[#d9785c] to-[#543b82]",
+            artUrl: showcaseArt2.src,
+        },
+        {
+            title: "Concept Art",
+            label: "Art placeholder 06",
+            tone: "from-[#a3d8ff] via-[#537dc7] to-[#29305d]",
+            artUrl: showcaseArt3.src,
+        },
+    ],
+    animation: [
+        {
+            title: "Spine Animation",
+            label: "Animation placeholder 01",
+            tone: "from-[#ff8a66] via-[#c34276] to-[#311c67]",
+            artUrl: showcaseArt3.src,
+        },
+        {
+            title: "Motion Design",
+            label: "Animation placeholder 02",
+            tone: "from-[#47d4f2] via-[#3a62c8] to-[#25224d]",
+            artUrl: showcaseArt3.src,
+        },
+        {
+            title: "Video Ad",
+            label: "Animation placeholder 03",
+            tone: "from-[#f5c451] via-[#e56b3d] to-[#6d275e]",
+            artUrl: showcaseArt3.src,
+        },
+        {
+            title: "UI Motion",
+            label: "Animation placeholder 04",
+            tone: "from-[#a9e86f] via-[#32a99b] to-[#174c75]",
+            artUrl: showcaseArt3.src,
+        },
+        {
+            title: "Character Rig",
+            label: "Animation placeholder 05",
+            tone: "from-[#f29bb2] via-[#a64e9c] to-[#372d75]",
+            artUrl: showcaseArt3.src,
+        },
+        {
+            title: "Cinematic Loop",
+            label: "Animation placeholder 06",
+            tone: "from-[#8be3e7] via-[#3576b5] to-[#243155]",
+            artUrl: showcaseArt3.src,
+        },
+    ],
+};
+---
+
+<section class="py-16 sm:py-24" aria-labelledby="showcase-title">
+    <Container>
+        <div class="showcase" data-showcase>
+            <h2
+                id="showcase-title"
+                class="m-0 mb-8 font-display text-4xl font-bold uppercase leading-none text-white sm:text-5xl"
+            >
+                Our <span class="text-[#20aaff]">Showcase</span>
+            </h2>
+
+            <div
+                class="showcase-tabs"
+                role="tablist"
+                aria-label="Showcase categories"
+            >
+                <button
+                    class="showcase-tab is-active"
+                    type="button"
+                    role="tab"
+                    aria-selected="true"
+                    data-showcase-tab="art">Art</button
+                >
+                <button
+                    class="showcase-tab"
+                    type="button"
+                    role="tab"
+                    aria-selected="false"
+                    data-showcase-tab="animation">Animation</button
+                >
+            </div>
+
+            {
+                Object.entries(showcases).map(
+                    ([category, items], categoryIndex) => (
+                        <div
+                            class={`showcase-slider ${categoryIndex === 0 ? "is-active" : ""}`}
+                            data-showcase-slider={category}
+                            role="tabpanel"
+                            aria-hidden={categoryIndex === 0 ? "false" : "true"}
+                        >
+                            <div class="showcase-viewport">
+                                <div class="showcase-track" data-showcase-track>
+                                    {items.map((item, index) => (
+                                        <a
+                                            class="showcase-slide"
+                                            href="#"
+                                            data-showcase-slide={index}
+                                        >
+                                            <div
+                                                class={`showcase-placeholder bg-no-repeat bg-cover`}
+                                                style={`background-image: url("${item.artUrl}");`}
+                                            >
+                                                
+                                            </div>
+                                        </a>
+                                    ))}
+                                </div>
+                            </div>
+
+                            <div class="showcase-controls">
+                                <button
+                                    class="showcase-arrow"
+                                    type="button"
+                                    data-showcase-previous
+                                    aria-label={`Previous ${category} slide`}
+                                >
+                                    &#8592;
+                                </button>
+                                <div class="showcase-dots">
+                                    {items.map((_, index) => (
+                                        <button
+                                            class={`showcase-dot ${index === 0 ? "is-active" : ""}`}
+                                            type="button"
+                                            data-showcase-dot={index}
+                                            aria-label={`Show ${category} slide ${index + 1}`}
+                                            aria-current={
+                                                index === 0 ? "true" : "false"
+                                            }
+                                        />
+                                    ))}
+                                </div>
+                                <button
+                                    class="showcase-arrow"
+                                    type="button"
+                                    data-showcase-next
+                                    aria-label={`Next ${category} slide`}
+                                >
+                                    &#8594;
+                                </button>
+                            </div>
+                        </div>
+                    ),
+                )
+            }
+        </div>
+    </Container>
+</section>
+
+<script>
+    const showcase = document.querySelector("[data-showcase]");
+
+    if (showcase) {
+        const sliders = [
+            ...showcase.querySelectorAll("[data-showcase-slider]"),
+        ];
+        const tabs = [...showcase.querySelectorAll("[data-showcase-tab]")];
+
+        const setSlide = (slider = showcase, nextIndex = 0) => {
+            const slides = [
+                ...slider.querySelectorAll("[data-showcase-slide]"),
+            ];
+            const dots = [...slider.querySelectorAll("[data-showcase-dot]")];
+            const visibleSlides = window.matchMedia("(max-width: 767px)")
+                .matches
+                ? 1
+                : 4;
+            const pageCount = Math.ceil(slides.length / visibleSlides);
+            const activeIndex = (nextIndex + pageCount) % pageCount;
+            const track = slider.querySelector("[data-showcase-track]");
+
+            track?.setAttribute(
+                "style",
+                `transform: translateX(-${activeIndex * 100}%);`,
+            );
+            dots.forEach((dot, index) => {
+                dot.classList.toggle("is-active", index === activeIndex);
+                dot.setAttribute("aria-current", String(index === activeIndex));
+            });
+            slider.setAttribute("data-active-slide", String(activeIndex));
+        };
+
+        const activateCategory = (category = "art") => {
+            tabs.forEach((tab) => {
+                const isActive =
+                    tab.getAttribute("data-showcase-tab") === category;
+                tab.classList.toggle("is-active", isActive);
+                tab.setAttribute("aria-selected", String(isActive));
+            });
+            sliders.forEach((slider) => {
+                const isActive =
+                    slider.getAttribute("data-showcase-slider") === category;
+                slider.classList.toggle("is-active", isActive);
+                slider.setAttribute("aria-hidden", String(!isActive));
+            });
+        };
+
+        tabs.forEach((tab) =>
+            tab.addEventListener("click", () =>
+                activateCategory(
+                    tab.getAttribute("data-showcase-tab") || "art",
+                ),
+            ),
+        );
+        sliders.forEach((slider) => {
+            const viewport = slider.querySelector(".showcase-viewport");
+            let dragStartX = 0;
+            let isDragging = false;
+
+            slider
+                .querySelector("[data-showcase-previous]")
+                ?.addEventListener("click", () =>
+                    setSlide(
+                        slider,
+                        Number(slider.getAttribute("data-active-slide") || 0) -
+                            1,
+                    ),
+                );
+            slider
+                .querySelector("[data-showcase-next]")
+                ?.addEventListener("click", () =>
+                    setSlide(
+                        slider,
+                        Number(slider.getAttribute("data-active-slide") || 0) +
+                            1,
+                    ),
+                );
+            slider
+                .querySelectorAll("[data-showcase-dot]")
+                .forEach((dot, index) =>
+                    dot.addEventListener("click", () =>
+                        setSlide(slider, index),
+                    ),
+                );
+
+            viewport?.addEventListener("pointerdown", (event) => {
+                const pointerEvent = event as unknown as {
+                    clientX: number;
+                    isPrimary: boolean;
+                    pointerId: number;
+                };
+                if (!pointerEvent.isPrimary) return;
+
+                dragStartX = pointerEvent.clientX;
+                isDragging = true;
+                viewport.setPointerCapture(pointerEvent.pointerId);
+                viewport.classList.add("is-dragging");
+            });
+
+            viewport?.addEventListener("pointerup", (event) => {
+                if (!isDragging) return;
+
+                const pointerEvent = event as unknown as {
+                    clientX: number;
+                    pointerId: number;
+                };
+                const dragDistance = pointerEvent.clientX - dragStartX;
+                isDragging = false;
+                viewport.releasePointerCapture(pointerEvent.pointerId);
+                viewport.classList.remove("is-dragging");
+
+                if (Math.abs(dragDistance) < 50) return;
+                setSlide(
+                    slider,
+                    Number(slider.getAttribute("data-active-slide") || 0) +
+                        (dragDistance < 0 ? 1 : -1),
+                );
+            });
+
+            viewport?.addEventListener("pointercancel", () => {
+                isDragging = false;
+                viewport.classList.remove("is-dragging");
+            });
+            setSlide(slider);
+        });
+        window.addEventListener("resize", () =>
+            sliders.forEach((slider) =>
+                setSlide(
+                    slider,
+                    Number(slider.getAttribute("data-active-slide") || 0),
+                ),
+            ),
+        );
+    }
+</script>
+
+<style>
+    .showcase-tabs {
+        display: flex;
+        gap: 1rem;
+        margin-bottom: 1.75rem;
+    }
+
+    .showcase-tab {
+        width: 128px;
+        border: 1px solid #3858aa;
+        border-radius: 999px;
+        padding: 0.45rem 1rem;
+        color: white;
+        font-size: 0.8rem;
+        font-weight: 700;
+        text-transform: capitalize;
+    }
+
+    .showcase-tab.is-active,
+    .showcase-tab:hover,
+    .showcase-tab:focus-visible {
+        border-color: #20aaff;
+        background: #20aaff;
+        color: #192131;
+    }
+
+    .showcase-slider {
+        display: none;
+    }
+
+    .showcase-slider.is-active {
+        display: block;
+    }
+
+    .showcase-viewport {
+        overflow: hidden;
+        border-radius: 0.75rem;
+        cursor: grab;
+        touch-action: pan-y;
+        user-select: none;
+    }
+
+    .showcase-viewport.is-dragging {
+        cursor: grabbing;
+    }
+
+    .showcase-track {
+        display: flex;
+        gap: 0.75rem;
+        transition: transform 300ms ease;
+    }
+
+    .showcase-slide {
+        min-width: 0;
+        flex: 0 0 calc((100% - 2.25rem) / 4);
+    }
+
+    .showcase-placeholder {
+        position: relative;
+        min-height: clamp(220px, 24vw, 300px);
+        overflow: hidden;
+        border-radius: 0.75rem;
+    }
+
+    .showcase-grid {
+        position: absolute;
+        inset: 0;
+        opacity: 0.2;
+        background-image:
+            linear-gradient(rgba(255, 255, 255, 0.35) 1px, transparent 1px),
+            linear-gradient(
+                90deg,
+                rgba(255, 255, 255, 0.35) 1px,
+                transparent 1px
+            );
+        background-size: 34px 34px;
+        transform: skewY(-8deg) scale(1.2);
+    }
+
+    .showcase-controls {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 1rem;
+        margin-top: 1rem;
+    }
+
+    .showcase-arrow {
+        color: #20aaff;
+        font-size: 1.25rem;
+    }
+
+    .showcase-dots {
+        display: flex;
+        gap: 0.75rem;
+    }
+
+    .showcase-dot {
+        width: 18px;
+        height: 18px;
+        border: 2px solid #3858aa;
+        border-radius: 999px;
+    }
+
+    .showcase-dot:nth-child(n + 3) {
+        display: none;
+    }
+
+    .showcase-dot.is-active,
+    .showcase-dot:hover,
+    .showcase-dot:focus-visible {
+        border-color: #20aaff;
+        background: #20aaff;
+    }
+
+    @keyframes showcase-in {
+        from {
+            opacity: 0;
+            transform: translateX(18px);
+        }
+        to {
+            opacity: 1;
+            transform: translateX(0);
+        }
+    }
+
+    @media (max-width: 767px) {
+        .showcase-slide {
+            flex-basis: 100%;
+        }
+        .showcase-dot:nth-child(n + 3) {
+            display: block;
+        }
+    }
+</style>

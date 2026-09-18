@@ -1,0 +1,109 @@
+---
+import Container from "../layouts/Container.astro";
+import projectImage1 from "../assets/projects/BloopiesTreasure_L.png";
+import projectImage2 from "../assets/projects/DragonDance_L.png";
+import projectImage3 from "../assets/projects/EMojiQuest_L.png";
+import projectImage4 from "../assets/projects/FishParadise_L.png";
+import projectImage5 from "../assets/projects/KitchenKaching_L.png";
+
+const projects = [
+    { title: "Fish Paradise", label: "Project image 01", imgUrl: projectImage1 },
+    { title: "Dragon Dance", label: "Project image 02", imgUrl: projectImage2 },
+    { title: "Emoji Quest", label: "Project image 03", imgUrl: projectImage3 },
+    { title: "Treasure Splash", label: "Project image 04", imgUrl: projectImage4 },
+    { title: "Kitchen Ka-Ching", label: "Project image 05", imgUrl: projectImage5 },
+];
+---
+
+<section class="py-16 sm:py-24" aria-labelledby="projects-title">
+    <Container>
+        <h2
+            id="projects-title"
+            class="m-0 mb-6 font-display text-4xl font-bold uppercase leading-none text-white sm:mb-8 sm:text-5xl"
+        >
+            Our <span class="text-[#20aaff]">Projects</span>
+        </h2>
+
+        <div class="projects-grid">
+            {
+                projects.map((project, index) => (
+                    <a
+                        class="project-card"
+                        href={project.imgUrl.src}
+                        aria-label={`View ${project.title} project`}
+                        target="_blank"
+                        rel="noreferrer"
+                    >
+                        <div
+                            class="h-full w-full bg-cover bg-center bg-no-repeat"
+                            style={`background-image: url("${project.imgUrl.src}");`}
+                        ></div>
+                    </a>
+                ))
+            }
+        </div>
+    </Container>
+</section>
+
+<style>
+    .projects-grid {
+        display: flex;
+        min-height: 340px;
+        gap: 0.5rem;
+        overflow: hidden;
+    }
+
+    .project-card {
+        position: relative;
+        display: block;
+        min-width: 0;
+        min-height: 340px;
+        flex: 1;
+        overflow: hidden;
+        border-radius: 0.75rem;
+        cursor: pointer;
+        transition: flex 350ms ease, filter 180ms ease;
+    }
+
+    .project-placeholder-grid {
+        position: absolute;
+        inset: 0;
+        opacity: 0.22;
+        background-image:
+            linear-gradient(rgba(255, 255, 255, 0.32) 1px, transparent 1px),
+            linear-gradient(90deg, rgba(255, 255, 255, 0.32) 1px, transparent 1px);
+        background-size: 34px 34px;
+        transform: skewY(-7deg) scale(1.2);
+    }
+
+    .project-card:hover,
+    .project-card:focus-visible {
+        flex: 2.2;
+        filter: brightness(1.12);
+        outline: 2px solid #20aaff;
+        outline-offset: 2px;
+    }
+
+    .project-link {
+        border: 1px solid rgba(255, 255, 255, 0.65);
+        background: rgba(14, 20, 32, 0.7);
+        padding: 0.5rem 0.75rem;
+        color: white;
+        font-size: 0.7rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        white-space: nowrap;
+    }
+
+    @media (max-width: 767px) {
+        .projects-grid {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            min-height: 0;
+        }
+
+        .project-card {
+            min-height: 190px;
+        }
+    }
+</style>
