@@ -1,46 +1,71 @@
-# Astro Starter Kit: Basics
+# Noman Portfolio
+
+An interactive portfolio website built with Astro, Tailwind CSS, and Rive. The site presents Noman's services, projects, showcase work, and value proposition through responsive sections and interactive sliders.
+
+## Tech Stack
+
+- Astro
+- Tailwind CSS
+- TypeScript
+- Rive canvas animations
+
+## Requirements
+
+- Node.js `22.12.0` or newer
+- npm
+
+## Getting Started
+
+Clone the repository and install dependencies:
 
 ```sh
-npm create astro@latest -- --template basics
+git clone https://github.com/Sefatohee/noman-portfolio.git
+cd noman-portfolio
+npm install
 ```
 
-> 🧑‍🚀 **Seasoned astronaut?** Delete this file. Have fun!
+Start the development server:
 
-## 🚀 Project Structure
+```sh
+npm run dev
+```
 
-Inside of your Astro project, you'll see the following folders and files:
+The site will be available at `http://localhost:4321`.
+
+## Available Commands
+
+| Command | Description |
+| --- | --- |
+| `npm run dev` | Start the local development server |
+| `npm run build` | Build the production site into `dist/` |
+| `npm run preview` | Preview the production build locally |
+| `npm run astro` | Run the Astro CLI |
+
+## Project Structure
 
 ```text
-/
-├── public/
-│   └── favicon.svg
-├── src
-│   ├── assets
-│   │   └── astro.svg
-│   ├── components
-│   │   └── Welcome.astro
-│   ├── layouts
-│   │   └── Layout.astro
-│   └── pages
-│       └── index.astro
-└── package.json
+src/
+├── assets/       Images and project artwork
+├── components/   Page sections and interactive UI
+├── layouts/      Shared layout components
+├── pages/        Astro routes
+└── styles/       Global styles
+public/           Public files, including the Rive animation
 ```
 
-To learn more about the folder structure of an Astro project, refer to [our guide on project structure](https://docs.astro.build/en/basics/project-structure/).
+## Adding Content
 
-## 🧞 Commands
+- Add portfolio artwork to `src/assets/`.
+- Update the data arrays in `Projects.astro` and `Showcase.astro` when adding cards.
+- Replace placeholder card links with project URLs when project pages are available.
+- Replace the Rive file in `public/` only when updating the hero animation source.
 
-All commands are run from the root of the project, from a terminal:
+## Deployment
 
-| Command                   | Action                                           |
-| :------------------------ | :----------------------------------------------- |
-| `npm install`             | Installs dependencies                            |
-| `npm run dev`             | Starts local dev server at `localhost:4321`      |
-| `npm run build`           | Build your production site to `./dist/`          |
-| `npm run preview`         | Preview your build locally, before deploying     |
-| `npm run astro ...`       | Run CLI commands like `astro add`, `astro check` |
-| `npm run astro -- --help` | Get help using the Astro CLI                     |
+Build the static site with:
 
-## 👀 Want to learn more?
+```sh
+npm run build
+```
 
-Feel free to check [our documentation](https://docs.astro.build) or jump into our [Discord server](https://astro.build/chat).
+Deploy the generated `dist/` directory to a static hosting provider such as GitHub Pages, Netlify, or Vercel.
