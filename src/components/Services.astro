@@ -26,18 +26,18 @@ const services = [
 ];
 ---
 
-<section class="py-16 sm:py-24" aria-labelledby="services-title">
+<section class="page-section" aria-labelledby="services-title">
     <Container>
         <div class="services-slider" data-services-slider>
-            <div class="mb-6 flex items-end justify-between gap-4 sm:mb-8">
+            <div class="services-header">
                 <h2
                     id="services-title"
-                    class="m-0 font-display text-4xl font-bold uppercase leading-none text-white sm:text-5xl"
+                    class="m-0 font-display text-4xl font-bold uppercase leading-none text-[#202938] sm:text-5xl"
                 >
-                    Our <span class="text-[#20aaff]">Services</span>
+                    Our <span class="text-[#087fca]">Services</span>
                 </h2>
 
-                <div class="hidden gap-2 sm:flex">
+                <div class="services-controls" aria-label="Services controls">
                     <button
                         class="slider-arrow"
                         type="button"
@@ -57,29 +57,37 @@ const services = [
                 </div>
             </div>
 
-            <div class="relative overflow-hidden">
+            <div class="services-viewport">
                 <div class="services-track" data-services-track>
                     {
                         services.map((service, index) => (
                             <article
-                                class={`service-slide ${index === 0 ? "is-active" : ""}`}
+                                class={`service-card ${index === 0 ? "is-active" : ""}`}
                                 data-slide={index}
                                 aria-hidden={index === 0 ? "false" : "true"}
                             >
                                 <div
-                                    class={`service-placeholder mx-auto w-[80%] rounded-2xl bg-cover bg-center bg-no-repeat ${service.tone}`}
+                                    class={`service-visual ${service.tone}`}
                                     style={`background-image: url("${service.serviceUrl}");`}
-                                ></div>
+                                >
+                                    <div class="service-overlay">
+                                        <span class="service-number">
+                                            {String(index + 1).padStart(2, "0")}
+                                        </span>
+
+                                        <div class="service-copy">
+                                            <p>{service.label}</p>
+                                            <h3>{service.title}</h3>
+                                        </div>
+                                    </div>
+                                </div>
                             </article>
                         ))
                     }
                 </div>
             </div>
 
-            <div
-                class="mt-5 flex items-center justify-center gap-3"
-                data-slide-dots
-            >
+            <div class="services-dots" data-slide-dots>
                 {
                     services.map((_, index) => (
                         <button
@@ -103,12 +111,37 @@ const services = [
         const track = slider.querySelector("[data-services-track]");
         const slides = [...slider.querySelectorAll("[data-slide]")];
         const dots = [...slider.querySelectorAll("[data-slide-dot]")];
+        const prevButton = slider.querySelector("[data-slide-previous]");
+        const nextButton = slider.querySelector("[data-slide-next]");
+
         let currentSlide = 0;
         let dragStartX = 0;
         let isDragging = false;
 
+        const getSlideOffset = () => {
+            if (!track || slides.length === 0) return 0;
+            const styles = window.getComputedStyle(track);
+            const gap = Number.parseFloat(
+                styles.gap || styles.columnGap || "0",
+            );
+            return (slides[0] as HTMLElement).offsetWidth + gap;
+        };
+
         const showSlide = (nextSlide = 0) => {
             currentSlide = (nextSlide + slides.length) % slides.length;
+
+            if (track) {
+                const viewport = slider.querySelector(".services-viewport");
+                const maxOffset = viewport
+                    ? track.scrollWidth - viewport.clientWidth
+                    : 0;
+                const offset = Math.min(
+                    currentSlide * getSlideOffset(),
+                    maxOffset,
+                );
+                (track as HTMLElement).style.transform =
+                    `translateX(-${offset}px)`;
+            }
 
             slides.forEach((slide, index) => {
                 const isActive = index === currentSlide;
@@ -123,12 +156,12 @@ const services = [
             });
         };
 
-        slider
-            .querySelector("[data-slide-previous]")
-            ?.addEventListener("click", () => showSlide(currentSlide - 1));
-        slider
-            .querySelector("[data-slide-next]")
-            ?.addEventListener("click", () => showSlide(currentSlide + 1));
+        prevButton?.addEventListener("click", () =>
+            showSlide(currentSlide - 1),
+        );
+        nextButton?.addEventListener("click", () =>
+            showSlide(currentSlide + 1),
+        );
         dots.forEach((dot, index) =>
             dot.addEventListener("click", () => showSlide(index)),
         );
@@ -167,97 +200,214 @@ const services = [
             isDragging = false;
             track.classList.remove("is-dragging");
         });
+
+        window.addEventListener("resize", () => showSlide(currentSlide));
+        showSlide(0);
     }
 </script>
 
 <style>
     .services-slider {
-        color: white;
+        color: var(--ink);
+    }
+
+    .services-header {
+        display: flex;
+        align-items: end;
+        justify-content: space-between;
+        gap: 1rem;
+        margin-bottom: 2rem;
+    }
+
+    .services-controls {
+        display: flex;
+        gap: 0.75rem;
+    }
+
+    .slider-arrow {
+        display: grid;
+        place-items: center;
+        width: 48px;
+        height: 48px;
+        border: 1px solid rgba(81, 110, 163, 0.45);
+        border-radius: 999px;
+        background: rgba(255, 255, 255, 0.7);
+        color: #202938;
+        font-size: 1.45rem;
+        box-shadow: 0 12px 30px rgba(17, 29, 53, 0.08);
+        transition:
+            transform 180ms ease,
+            border-color 180ms ease,
+            background-color 180ms ease,
+            color 180ms ease;
+    }
+
+    .slider-arrow:hover,
+    .slider-arrow:focus-visible {
+        border-color: rgba(8, 127, 202, 0.8);
+        background: #20aaff;
+        color: #fff;
+        transform: translateY(-1px);
+    }
+
+    .services-viewport {
+        overflow: hidden;
+        padding-bottom: 0.5rem;
     }
 
     .services-track {
-        display: grid;
+        display: flex;
+        gap: clamp(0.75rem, 1.5vw, 1.25rem);
+        width: 100%;
         cursor: grab;
         touch-action: pan-y;
         user-select: none;
+        transition: transform 420ms cubic-bezier(0.22, 1, 0.36, 1);
     }
 
     .services-track.is-dragging {
         cursor: grabbing;
     }
 
-    .service-slide {
-        display: none;
+    .service-card {
+        width: 65%;
+        min-width: 65%;
+        flex: 0 0 65%;
+        opacity: 0.58;
+        filter: saturate(0.7);
+        transform: scale(0.96);
+        transition:
+            opacity 260ms ease,
+            filter 260ms ease,
+            transform 260ms ease;
     }
 
-    .service-slide.is-active {
-        display: block;
-        animation: slide-in 350ms ease-out;
+    .service-card.is-active {
+        opacity: 1;
+        filter: saturate(1);
+        transform: scale(1);
     }
 
-    .service-placeholder {
+    .service-visual {
         position: relative;
-        aspect-ratio: 16 / 8;
-        min-height: clamp(240px, 32vw, 440px);
+        aspect-ratio: 1.57;
+        min-height: clamp(260px, 32vw, 470px);
         overflow: hidden;
+        border-radius: 30px;
+        border: 1px solid rgba(255, 255, 255, 0.18);
+        box-shadow: 0 26px 80px rgba(6, 14, 28, 0.2);
+        background-size: cover;
+        background-position: center;
     }
 
-    .placeholder-grid {
+    .service-visual::before {
+        content: "";
         position: absolute;
         inset: 0;
-        opacity: 0.2;
-        background-image:
-            linear-gradient(rgba(255, 255, 255, 0.35) 1px, transparent 1px),
-            linear-gradient(
-                90deg,
-                rgba(255, 255, 255, 0.35) 1px,
-                transparent 1px
-            );
-        background-size: 42px 42px;
-        transform: skewY(-8deg) scale(1.25);
+        background: linear-gradient(
+            180deg,
+            rgba(11, 17, 27, 0.05) 0%,
+            rgba(11, 17, 27, 0.14) 32%,
+            rgba(11, 17, 27, 0.72) 100%
+        );
     }
 
-    .slider-arrow {
-        display: grid;
-        width: 42px;
-        height: 42px;
-        place-items: center;
-        border: 1px solid rgba(255, 255, 255, 0.35);
-        color: white;
-        font-size: 1.25rem;
-        transition:
-            background-color 180ms ease,
-            border-color 180ms ease;
+    .service-overlay {
+        position: absolute;
+        inset: 0;
+        z-index: 1;
+        display: flex;
+        align-items: end;
+        justify-content: space-between;
+        gap: 1rem;
+        padding: clamp(1.2rem, 2vw, 2rem);
     }
 
-    .slider-arrow:hover,
-    .slider-arrow:focus-visible {
-        border-color: #20aaff;
-        background: #20aaff;
-        color: #1d212d;
+    .service-number {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        min-width: 3rem;
+        height: 3rem;
+        border: 1px solid rgba(255, 255, 255, 0.26);
+        border-radius: 999px;
+        background: rgba(9, 17, 29, 0.18);
+        backdrop-filter: blur(10px);
+        color: #f3f6ff;
+        font-size: 0.72rem;
+        font-weight: 700;
+        letter-spacing: 0.16em;
+    }
+
+    .service-copy {
+        text-align: right;
+    }
+
+    .service-copy p {
+        margin: 0 0 0.5rem;
+        color: rgba(255, 255, 255, 0.78);
+        font-size: 0.7rem;
+        font-weight: 700;
+        letter-spacing: 0.16em;
+        text-transform: uppercase;
+    }
+
+    .service-copy h3 {
+        margin: 0;
+        color: #ffffff;
+        font-size: clamp(1.5rem, 2vw, 2.4rem);
+        font-weight: 700;
+        letter-spacing: -0.05em;
+        line-height: 1;
+    }
+
+    .services-dots {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.7rem;
+        margin-top: 1.5rem;
     }
 
     .slider-dot {
-        width: 18px;
-        height: 18px;
-        border: 2px solid #3858aa;
+        width: 14px;
+        height: 14px;
+        padding: 0;
+        border: 2px solid rgba(56, 88, 170, 0.8);
         border-radius: 999px;
+        background: transparent;
         transition:
+            width 180ms ease,
             background-color 180ms ease,
-            border-color 180ms ease;
+            border-color 180ms ease,
+            transform 180ms ease;
     }
 
     .slider-dot.is-active,
     .slider-dot:hover,
     .slider-dot:focus-visible {
+        width: 34px;
         border-color: #20aaff;
         background: #20aaff;
+        transform: scale(1.02);
+    }
+
+    @media (max-width: 640px) {
+        .services-header {
+            align-items: start;
+            flex-direction: column;
+        }
+
+        .services-controls {
+            width: 100%;
+            justify-content: flex-end;
+        }
     }
 
     @keyframes slide-in {
         from {
             opacity: 0;
-            transform: translateX(18px);
+            transform: translateX(20px);
         }
         to {
             opacity: 1;
