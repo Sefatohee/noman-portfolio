@@ -57,13 +57,12 @@ const services = [
                 </div>
             </div>
 
-            <div class="services-viewport">
-                <div class="services-track" data-services-track>
+            <div class="services-viewport swiper" data-services-viewport>
+                <div class="services-track swiper-wrapper">
                     {
                         services.map((service, index) => (
                             <article
-                                class={`service-card ${index === 0 ? "is-active" : ""}`}
-                                data-slide={index}
+                                class={`service-card swiper-slide ${index === 0 ? "is-active" : ""}`}
                                 aria-hidden={index === 0 ? "false" : "true"}
                             >
                                 <div
@@ -105,104 +104,69 @@ const services = [
 </section>
 
 <script>
+    import Swiper from "swiper";
+    import { EffectCoverflow } from "swiper/modules";
+    import "swiper/css";
+    import "swiper/css/effect-coverflow";
+
     const slider = document.querySelector("[data-services-slider]");
 
     if (slider) {
-        const track = slider.querySelector("[data-services-track]");
-        const slides = [...slider.querySelectorAll("[data-slide]")];
-        const dots = [...slider.querySelectorAll("[data-slide-dot]")];
-        const prevButton = slider.querySelector("[data-slide-previous]");
-        const nextButton = slider.querySelector("[data-slide-next]");
+        const viewport = slider.querySelector<HTMLElement>(
+            "[data-services-viewport]",
+        );
+        const slides = [...slider.querySelectorAll<HTMLElement>(".service-card")];
+        const dots = [...slider.querySelectorAll<HTMLButtonElement>("[data-slide-dot]")];
+        const prevButton = slider.querySelector<HTMLButtonElement>(
+            "[data-slide-previous]",
+        );
+        const nextButton = slider.querySelector<HTMLButtonElement>(
+            "[data-slide-next]",
+        );
 
-        let currentSlide = 0;
-        let dragStartX = 0;
-        let isDragging = false;
+        if (viewport) {
+            const updateSliderState = (swiper: Swiper) => {
+                slides.forEach((slide) => {
+                    const isActive = slide.classList.contains("swiper-slide-active");
+                    slide.classList.toggle("is-active", isActive);
+                    slide.setAttribute("aria-hidden", String(!isActive));
+                });
 
-        const getSlideOffset = () => {
-            if (!track || slides.length === 0) return 0;
-            const styles = window.getComputedStyle(track);
-            const gap = Number.parseFloat(
-                styles.gap || styles.columnGap || "0",
+                dots.forEach((dot, index) => {
+                    const isActive = index === swiper.realIndex;
+                    dot.classList.toggle("is-active", isActive);
+                    dot.setAttribute("aria-current", String(isActive));
+                });
+            };
+
+            const swiper = new Swiper(viewport, {
+                modules: [EffectCoverflow],
+                slidesPerView: "auto",
+                centeredSlides: true,
+                spaceBetween: 20,
+                loop: true,
+                speed: 600,
+                grabCursor: true,
+                effect: "coverflow",
+                coverflowEffect: {
+                    rotate: 0,
+                    stretch: 0,
+                    depth: 120,
+                    modifier: 1,
+                    slideShadows: false,
+                },
+                on: {
+                    init: updateSliderState,
+                    slideChange: updateSliderState,
+                },
+            });
+
+            prevButton?.addEventListener("click", () => swiper.slidePrev());
+            nextButton?.addEventListener("click", () => swiper.slideNext());
+            dots.forEach((dot, index) =>
+                dot.addEventListener("click", () => swiper.slideToLoop(index)),
             );
-            return (slides[0] as HTMLElement).offsetWidth + gap;
-        };
-
-        const showSlide = (nextSlide = 0) => {
-            currentSlide = (nextSlide + slides.length) % slides.length;
-
-            if (track) {
-                const viewport = slider.querySelector(".services-viewport");
-                const maxOffset = viewport
-                    ? track.scrollWidth - viewport.clientWidth
-                    : 0;
-                const offset = Math.min(
-                    currentSlide * getSlideOffset(),
-                    maxOffset,
-                );
-                (track as HTMLElement).style.transform =
-                    `translateX(-${offset}px)`;
-            }
-
-            slides.forEach((slide, index) => {
-                const isActive = index === currentSlide;
-                slide.classList.toggle("is-active", isActive);
-                slide.setAttribute("aria-hidden", String(!isActive));
-            });
-
-            dots.forEach((dot, index) => {
-                const isActive = index === currentSlide;
-                dot.classList.toggle("is-active", isActive);
-                dot.setAttribute("aria-current", String(isActive));
-            });
-        };
-
-        prevButton?.addEventListener("click", () =>
-            showSlide(currentSlide - 1),
-        );
-        nextButton?.addEventListener("click", () =>
-            showSlide(currentSlide + 1),
-        );
-        dots.forEach((dot, index) =>
-            dot.addEventListener("click", () => showSlide(index)),
-        );
-
-        track?.addEventListener("pointerdown", (event) => {
-            const pointerEvent = event as unknown as {
-                clientX: number;
-                isPrimary: boolean;
-                pointerId: number;
-            };
-            if (!pointerEvent.isPrimary) return;
-
-            dragStartX = pointerEvent.clientX;
-            isDragging = true;
-            track.setPointerCapture(pointerEvent.pointerId);
-            track.classList.add("is-dragging");
-        });
-
-        track?.addEventListener("pointerup", (event) => {
-            if (!isDragging) return;
-
-            const pointerEvent = event as unknown as {
-                clientX: number;
-                pointerId: number;
-            };
-            const dragDistance = pointerEvent.clientX - dragStartX;
-            isDragging = false;
-            track.releasePointerCapture(pointerEvent.pointerId);
-            track.classList.remove("is-dragging");
-
-            if (Math.abs(dragDistance) < 50) return;
-            showSlide(dragDistance < 0 ? currentSlide + 1 : currentSlide - 1);
-        });
-
-        track?.addEventListener("pointercancel", () => {
-            isDragging = false;
-            track.classList.remove("is-dragging");
-        });
-
-        window.addEventListener("resize", () => showSlide(currentSlide));
-        showSlide(0);
+        }
     }
 </script>
 
@@ -256,36 +220,24 @@ const services = [
     }
 
     .services-track {
-        display: flex;
-        gap: clamp(0.75rem, 1.5vw, 1.25rem);
-        width: 100%;
-        cursor: grab;
-        touch-action: pan-y;
-        user-select: none;
-        transition: transform 420ms cubic-bezier(0.22, 1, 0.36, 1);
-    }
-
-    .services-track.is-dragging {
-        cursor: grabbing;
+        align-items: stretch;
     }
 
     .service-card {
         width: 65%;
         min-width: 65%;
         flex: 0 0 65%;
+        height: auto;
         opacity: 0.58;
         filter: saturate(0.7);
-        transform: scale(0.96);
         transition:
             opacity 260ms ease,
-            filter 260ms ease,
-            transform 260ms ease;
+            filter 260ms ease;
     }
 
     .service-card.is-active {
         opacity: 1;
         filter: saturate(1);
-        transform: scale(1);
     }
 
     .service-visual {
